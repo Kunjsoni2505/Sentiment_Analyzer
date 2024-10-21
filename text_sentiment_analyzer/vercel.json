@@ -1,27 +1,15 @@
 {
   "version": 2,
   "builds": [
-  {
-    "src": "text_sentiment_analyzer\wsgi.py"
-    "use": "@vercel/python",
-    "config": { "maxLambdaSize": "15mb", "runtime": "python3.10"}
-  },
-  {
-    "src": "build_files.sh",
-    "use": "@vercel/static-build",
-    "config": {
-      "disDir": "staticfiles_build"
+    {
+      "src": "manage.py",
+      "use": "@vercel/python"
     }
-  }
   ],
   "routes": [
-  {
-    "src": "/static/(.*)",
-    "dest": "/static/$1"
-  },
-  {
-    "src": "/(.*)",
-    "dest": "text_sentiment_analyzer\wsgi.py"
-  }
- ]
+    {
+      "src": "/(.*)",
+      "dest": "manage.py"
+    }
+  ]
 }
