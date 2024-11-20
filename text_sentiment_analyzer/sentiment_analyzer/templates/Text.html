@@ -4,187 +4,190 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Sentiment Analyzer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Lobster&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <script>
+        function increaseRows() {
+            var textarea = document.getElementById("id_text");
+            textarea.rows = 10; // Increase rows to 10 on focus
+        }
+
+        function resetRows() {
+            var textarea = document.getElementById("id_text");
+            textarea.rows = 5; // Reset rows back to 5 when focus is lost
+        }
+    </script>
     <style>
         /* General Styles */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: #333;
-            background-image: url('/static/codifyformatter.png');
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-position: center center;
-            height: 100vh;
+            padding: 0;
             overflow: hidden;
-            position: relative;
-        }
-
-        /* Shiny Glassy Overlay */
-        .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                rgba(255, 255, 255, 0.2),
-                rgba(255, 255, 255, 0.2)
-            ); /* Light glossy gradient */
-            z-index: 0;
-            pointer-events: none; /* Ensures overlay doesn't interfere with user interactions */
-        }
-
-        .main-heading {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 20px 0;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.4); /* Slightly transparent background */
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
-        h1 {
-            font-family: 'Lobster', cursive;
-            color: #333;
-            margin: 0;
-            font-size: 2.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2), 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-
-        .form-container {
+            height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            width: 100%;
-            margin-top: 100px; /* Offset for fixed header */
-            z-index: 1000; /* Ensure form is above the overlay */
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(to bottom, #ff7e79, #ffe05d, #5ab4f7); /* Positive to Negative Sentiment */
+            background-size: cover;
+            background-attachment: fixed;
+            color: #fff;
         }
 
-        .form {
-            max-width: 500px;
+        /* Layout: Text on the left, Form on the right */
+        .content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             width: 90%;
-            background-color: rgba(255, 255, 255, 0.2); /* Glassy look */
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-            backdrop-filter: blur(10px); /* Adds glassy effect */
-            margin: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.4); /* Subtle border for clarity */
+            max-width: 1200px;
         }
 
-        .form:hover {
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
-            transform: translateY(-5px);
+        /* Text Section */
+        .text-section {
+            width: 50%;
+            text-align: left;
         }
 
-        form label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
+        .text-section h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+        }
+
+        .text-section p {
             font-size: 1.2rem;
-            font-weight: 600;
+            line-height: 1.5;
+            margin: 20px 0;
         }
 
-        form input[type="text"],
-        form input[type="number"] {
-            width: calc(100% - 24px);
+        /* Form Section */
+        .form-container {
+            width: 40%;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .form-container textarea {
+            width: 90%;
             padding: 12px;
             margin-bottom: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.6);
+            border: none;
             border-radius: 5px;
-            box-sizing: border-box;
-            font-size: 1rem;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-            background-color: rgba(255, 255, 255, 0.5); /* Glassy input field */
-            backdrop-filter: blur(5px);
-            color: #333;
-        }
-
-        form input[type="text"]:focus,
-        form input[type="number"]:focus {
-            border-color: #3f51b5;
-            box-shadow: 0 0 5px rgba(63, 81, 181, 0.5);
             outline: none;
-            background-color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            transition: transform 0.3s ease, background-color 0.3s ease;
         }
 
-        form button {
-            background: rgba(255, 255, 255, 0.2); /* Glassy button */
-            color: #2c3e50; /* Darker text color for better contrast */
-            padding: 14px 28px;
-            border: 2px solid rgba(255, 255, 255, 0.6);
-            border-radius: 5px;
-            cursor: pointer;
+        .form-container textarea:focus {
+            transform: scale(1.05);
+            background: rgba(255, 255, 255, 1);
+        }
+
+        .form-container button {
+            padding: 12px 20px;
             width: 100%;
-            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-            font-size: 1.1rem;
-            font-family: 'Montserrat', sans-serif; /* Different attractive font for button text */
-            font-weight: 600; /* Bold text */
-            margin-top: 10px;
+            background: linear-gradient(45deg, #27ae60, #2980b9);
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        form button:hover {
-            background: rgba(255, 255, 255, 0.4); /* Slightly less transparent */
-            color: #1abc9c; /* Lighter color on hover */
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        .form-container button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* Interactive elements */
-        form button:active {
-            transform: translateY(0px);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        /* Emoji Animation */
+        .emoji {
+            position: absolute;
+            top: -10px;
+            font-size: 2rem;
+            animation: fall 8s linear infinite;
+            opacity: 0.9;
         }
 
-        form input[type="text"]:hover,
-        form input[type="number"]:hover {
-            background-color: rgba(255, 255, 255, 0.6);
+        @keyframes fall {
+            0% {
+                transform: translateY(0) translateX(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(110vh) translateX(30px);
+                opacity: 0.5;
+            }
         }
 
-        /* Responsive adjustments */
+        .emoji:nth-child(odd) {
+            animation-duration: 6s;
+        }
+
+        .emoji:nth-child(even) {
+            animation-duration: 9s;
+        }
+
+        /* Responsive Design */
         @media (max-width: 768px) {
-            h1 {
+            .content {
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .text-section, .form-container {
+                width: 90%;
+                text-align: center;
+            }
+
+            .text-section h1 {
                 font-size: 2rem;
             }
 
-            .form {
-                width: 90%;
-                padding: 20px;
-            }
-
-            form button {
-                padding: 12px;
+            .text-section p {
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-
-    <div class="overlay"></div> <!-- Shiny glassy overlay -->
-
-    <div class="main-heading">
-        <h1>Analyze Text Sentiment</h1>
+    <!-- Emoji Container -->
+    <div class="emoji-container">
+        <span class="emoji" style="left: 10%;">😊</span>
+        <span class="emoji" style="left: 20%;">😐</span>
+        <span class="emoji" style="left: 30%;">😞</span>
+        <span class="emoji" style="left: 40%;">🤩</span>
+        <span class="emoji" style="left: 50%;">🥹</span>
+        <span class="emoji" style="left: 60%;">😫</span>
+        <span class="emoji" style="left: 70%;">😊</span>
+        <span class="emoji" style="left: 80%;">🥺</span>
+        <span class="emoji" style="left: 90%;">😡</span>
     </div>
 
-    <div class="form-container">
-        <div class="form">
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Text Section (Left) -->
+        <div class="text-section">
+            <h1>Text Sentiment Analyzer</h1>
+            <p>Analyze your text for sentiment insights. Get results categorized into positive, neutral, and negative emotions. Enter your text and click 'Analyze' to start!</p>
+        </div>
+
+        <!-- Form Section (Right) -->
+        <div class="form-container">
             <form method="post" action="{% url 'process_text' %}">
                 {% csrf_token %}
-                {{ form.as_p }}
+                <textarea id="id_text" name="text" rows="5" cols="50" onmouseover="increaseRows()" onmouseleave="resetRows()" placeholder="Enter your text here..." required></textarea>
                 <button type="submit">Analyze</button>
             </form>
         </div>
     </div>
-
 </body>
 </html>

@@ -1,15 +1,20 @@
 from django.shortcuts import render
 import os
 import pandas as pd
-from django.shortcuts import render
-from .forms import SentimentForm
+import requests
 import nltk
 import pickle
+from .forms import SentimentForm
+from .cleaner import TextCleaner, TextSequencer
+import google.generativeai as genai  # Import the Gemini API library
+from tensorflow.keras.models import load_model
 
+# Download necessary NLTK data
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
-from .cleaner import TextCleaner, TextSequencer
+
+
 class CustomUnpickler(pickle.Unpickler):
     def find_class(self, module, name):
         if name == 'TextCleaner':
@@ -17,51 +22,73 @@ class CustomUnpickler(pickle.Unpickler):
         elif name == 'TextSequencer':
             return TextSequencer
         return super().find_class(module, name)
-# # Load the model
+
+
+# Load the model and preprocessing pipeline
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 model_path = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model (3).h5')
 pre_path = os.path.join(BASE_DIR, 'sentiment_analyzer', 'text_pipeline.pkl')
-# model = load_model(model_path, compile=False)
 
-
-# # Load the pipeline
 with open(pre_path, 'rb') as file:
     loaded_pipeline = CustomUnpickler(file).load()
 
-# Load the model
-from tensorflow.keras.models import load_model
-loaded_model = load_model(model_path, compile = False)
+loaded_model = load_model(model_path, compile=False)
+
+# Set up Gemini Pro API
+GOOGLE_API_KEY = "AIzaSyAz2e2mKPepUUkUWwQkoD41zCjcKqvjL0s"
+genai.configure(api_key=GOOGLE_API_KEY)
 
 
 # Prediction function
+def predict(text):
+    try:
+        processed_text = loaded_pipeline.transform(pd.Series([text]))
+        prediction = loaded_model.predict(processed_text)
+        return prediction
+    except Exception as e:
+        return str(e)
+
+
+def predict_sentiment(text):
+    prediction = predict(text)
+    if isinstance(prediction, str):  # Check for error
+        return f"Error: {prediction}"
+
+    if prediction.shape[1] == 3:
+        if prediction[0][0] > prediction[0][1] and prediction[0][0] > prediction[0][2]:
+            return 'negative'
+        elif prediction[0][1] > prediction[0][0] and prediction[0][1] > prediction[0][2]:
+            return 'neutral'
+        else:
+            return 'positive'
+    else:
+        return "Prediction format not as expected."
+
+
+def get_description(text):
+    try:
+        prompt = f"Provide a brief description for: {text}"
+        model = genai.GenerativeModel('gemini-pro')
+        response = model.generate_content(prompt)
+        return response.text if hasattr(response, 'text') else "Error: No text generated."
+    except Exception as e:
+        return f"Error: {e}"
+
+
 def process_text(request):
     if request.method == 'POST':
         form = SentimentForm(request.POST)
         if form.is_valid():
-            # Retrieve cleaned data from the form
             data = form.cleaned_data['text']
-            def predict(text):
-                processed_text = loaded_pipeline.transform(pd.Series([text]))
-                prediction = loaded_model.predict(processed_text)
-                return prediction
-            def predict_sentiment(text):
-                prediction = predict(text)
-                # Check the shape of prediction and handle it accordingly
-                if prediction.shape[1] == 3:
-                    sentiment = ''
-                    if prediction[0][0] > prediction[0][1] and prediction[0][0] > prediction[0][2]:
-                        sentiment = 'negative'
-                    elif prediction[0][1] > prediction[0][0] and prediction[0][1] > prediction[0][2]:
-                        sentiment = 'neutral'
-                    else:
-                        sentiment = 'positive'
-                    return sentiment
-                else:
-                    return "Prediction format not as expected."
+
+            # Fetch sentiment and description
+            sentiment = predict_sentiment(data)
+            description = get_description(data)
+
             context = {
                 'form': form,
-                'prediction': predict_sentiment(data),
-                # Include input data for rendering in the template
+                'prediction': sentiment,
+                'description': description,
             }
 
             return render(request, 'result.html', context)
