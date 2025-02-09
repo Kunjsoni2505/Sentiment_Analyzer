@@ -8,6 +8,8 @@ from .forms import SentimentForm
 from .cleaner import TextCleaner, TextSequencer
 import google.generativeai as genai  # Import the Gemini API library
 from tensorflow.keras.models import load_model
+from django.http import HttpResponse
+import csv
 
 # Download necessary NLTK data
 nltk.download('stopwords')
@@ -73,6 +75,47 @@ def get_description(text):
         return response.text if hasattr(response, 'text') else "Error: No text generated."
     except Exception as e:
         return f"Error: {e}"
+
+
+# Function to process CSV input and return a CSV output
+def process_csv(request):
+    if request.method == 'POST' and request.FILES['csv_file']:
+        uploaded_file = request.FILES['csv_file']
+        # Read the CSV file into a DataFrame
+        df = pd.read_csv(uploaded_file)
+
+        if 'text' not in df.columns:
+            return HttpResponse("CSV must contain a 'text' column", status=400)
+
+        # Initialize lists to hold results
+        sentiments = []
+        descriptions = []
+
+        # Process each row in the DataFrame
+        for text in df['text']:
+            sentiment = predict_sentiment(text)
+            description = get_description(text)
+            sentiments.append(sentiment)
+            descriptions.append(description)
+
+        # Add the sentiment and description columns to the DataFrame
+        df['sentiment'] = sentiments
+        df['description'] = descriptions
+
+        # Create a new CSV response to send to the user
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename=sentiment_analysis_results.csv'
+
+        writer = csv.writer(response)
+        # Write the header
+        writer.writerow(df.columns)
+        # Write the data
+        for row in df.values:
+            writer.writerow(row)
+
+        return response
+
+    return render(request, 'upload_csv.html')  # A form for uploading CSV
 
 
 def process_text(request):
