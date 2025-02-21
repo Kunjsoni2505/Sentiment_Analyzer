@@ -3,14 +3,24 @@ from pathlib import Path
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-MODEL_PATH = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model (3).h5')
+MODEL_PATH = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model.h5')  # Updated model name
 
 # Security Settings
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-a7w1b^$$z@n%iic)$8#+_u5u8c(l59(40qa!mm(5t)2p3ajget')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'vercel.app,.vercel.app,localhost,127.0.0.1').split(',')
-CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', 'https://text_sentiment_analyzer.vercel.app').split(',')
+ALLOWED_HOSTS = [
+    'text-sentiment-analyzer.vercel.app',
+    '.vercel.app',
+    'localhost',
+    '127.0.0.1'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://text-sentiment-analyzer-1xqthn548-kunjsoni2505s-projects.vercel.app',
+    'https://text-sentiment-analyzer.vercel.app'
+]
+
 
 # Application definition
 INSTALLED_APPS = [
@@ -41,7 +51,7 @@ ROOT_URLCONF = 'text_sentiment_analyzer.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Ensure you have a templates directory
+        'DIRS': [os.path.join(BASE_DIR, 'sentiment_analyzer', 'templates')],  # Updated template path
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -79,6 +89,7 @@ USE_TZ = True
 # Static Files Configuration
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'sentiment_analyzer', 'static')]  # Added static files dir
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # CORS Configuration (Allow Frontend Domains)

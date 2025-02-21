@@ -1,1 +1,2 @@
-web: gunicorn text_sentiment_analyzer.wsgi:application
+web: gunicorn text_sentiment_analyzer.wsgi --log-file -
+
