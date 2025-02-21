@@ -2,14 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "manage.py",
-      "use": "@vercel/python"
+      "src": "text_sentiment_analyzer/manage.py",
+      "use": "@vercel/python",
+      "config": { "zeroConfig": true }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "manage.py"
+      "dest": "text_sentiment_analyzer/manage.py"
     }
   ]
 }
