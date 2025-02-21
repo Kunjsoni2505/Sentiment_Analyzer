@@ -9,7 +9,7 @@ MODEL_PATH = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model.h5')  # Upd
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-a7w1b^$$z@n%iic)$8#+_u5u8c(l59(40qa!mm(5t)2p3ajget')
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['.railway.app', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
 
 
