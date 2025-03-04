@@ -10,6 +10,9 @@ import google.generativeai as genai  # Import the Gemini API library
 from tensorflow.keras.models import load_model
 from django.http import HttpResponse
 import csv
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
 
 # Download necessary NLTK data
 nltk.download('stopwords')
