@@ -9,7 +9,8 @@ MODEL_PATH = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model.h5')  # Upd
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-a7w1b^$$z@n%iic)$8#+_u5u8c(l59(40qa!mm(5t)2p3ajget')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 
-ALLOWED_HOSTS = ['text_sentiment_analyzer.onrender.com', '127.0.0.1']
+ALLOWED_HOSTS = ['text_sentiment_analyzer.onrender.com', 'sentiment-analyzer-2h3q.onrender.com', '127.0.0.1']
+
 CSRF_TRUSTED_ORIGINS = [
     'https://text_sentiment_analyzer.onrender.com',
     'http://localhost:3000',
