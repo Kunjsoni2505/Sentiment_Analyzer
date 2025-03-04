@@ -7,12 +7,15 @@ MODEL_PATH = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model.h5')  # Upd
 
 # Security Settings
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-a7w1b^$$z@n%iic)$8#+_u5u8c(l59(40qa!mm(5t)2p3ajget')
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 
-ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://*.railway.app']
-
-
+ALLOWED_HOSTS = ['text_sentiment_analyzer.vercel.app', '127.0.0.1']
+CSRF_TRUSTED_ORIGINS = [
+    'https://text_sentiment_analyzer.vercel.app',
+    'http://text_sentiment_analyzer.vercel.app',
+    'http://localhost:3000',
+    'https://localhost:3000'
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -43,7 +46,7 @@ ROOT_URLCONF = 'text_sentiment_analyzer.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'sentiment_analyzer', 'templates')],  # Updated template path
+        'DIRS': [os.path.join(BASE_DIR, 'sentiment_analyzer', 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -58,7 +61,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'text_sentiment_analyzer.wsgi.application'
 
-# Database Configuration (Handles PostgreSQL from Vercel if provided)
+# Database Configuration
 DATABASES = {
     'default': dj_database_url.config(default=f'sqlite:///{BASE_DIR / "db.sqlite3"}', conn_max_age=600)
 }
@@ -81,8 +84,12 @@ USE_TZ = True
 # Static Files Configuration
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'sentiment_analyzer', 'static')]  # Added static files dir
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'sentiment_analyzer', 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Media Files (For Uploaded Images)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS Configuration (Allow Frontend Domains)
 CORS_ALLOWED_ORIGINS = [

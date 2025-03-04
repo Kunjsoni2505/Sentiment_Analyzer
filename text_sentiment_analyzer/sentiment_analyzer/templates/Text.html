@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Sentiment Analyzer</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script>
         // Function to increase textarea rows
         function increaseRows() {
@@ -198,10 +199,40 @@
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
+
+        .back-home {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 10px 15px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .back-home i {
+        margin-right: 8px;
+    }
+
+    .back-home:hover {
+        transform: scale(1.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
     </style>
 </head>
 <body>
+    <a href="/" class="back-home">
+    <i class="fas fa-home"></i> Home
+    </a>
     <div class="content">
+
         <div class="text-section">
             <h1>Text Sentiment Analyzer</h1>
             <p>Analyze your text for sentiment insights. Get results categorized into positive, neutral, and negative emotions. Enter your text or upload a CSV file to start!</p>
@@ -222,6 +253,7 @@
                     <label for="csv_file" class="custom-file-upload">Choose File</label>
                     <input id="csv_file" type="file" name="csv_file" accept=".csv" required onchange="toggleUploadButton()">
                     <button id="upload_csv_button" type="submit">Upload CSV</button>
+
                 </form>
             </div>
         </div>
