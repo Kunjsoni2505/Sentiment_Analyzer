@@ -30,7 +30,7 @@ class CustomUnpickler(pickle.Unpickler):
 
 # Load the model and preprocessing pipeline
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-model_path = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model (3).h5')
+model_path = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model_tf15.h5')
 pre_path = os.path.join(BASE_DIR, 'sentiment_analyzer', 'text_pipeline.pkl')
 
 with open(pre_path, 'rb') as file:
