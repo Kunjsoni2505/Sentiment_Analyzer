@@ -11,7 +11,15 @@ from tensorflow.keras.models import load_model
 from django.http import HttpResponse
 import csv
 import os
+import tensorflow as tf
+
+# Prevent TensorFlow from using GPU (if running on CPU)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+
+# Check if GPU is available before setting memory growth
+physical_devices = tf.config.list_physical_devices('GPU')
+if physical_devices:
+    tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 
 # Download necessary NLTK data
