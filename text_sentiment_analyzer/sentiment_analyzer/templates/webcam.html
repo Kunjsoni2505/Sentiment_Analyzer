@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Sentiment Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle, #1e1e1e, #121212);
+            color: white;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            max-width: 900px;
+            width: 90%;
+            position: relative;
+            z-index: 2;
+            flex-direction: column;
+            transition: background 0.5s ease;
+        }
+
+        .analysis {
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 400px;
+            border: 3px solid white;
+            border-radius: 10px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+            display: none;
+        }
+
+        button {
+            padding: 12px;
+            font-size: 1rem;
+            background: linear-gradient(45deg, #ff7eb3, #ff758c);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        #sentimentResult {
+            margin-top: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            transition: color 0.5s ease;
+        }
+
+        .home-button {
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            background: linear-gradient(45deg, #57c1eb, #246fa8);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .home-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="analysis">
+            <h2>Real-Time Webcam Sentiment Analysis</h2>
+            <p id="sentimentResult">Click 'Start Webcam' to begin analysis.</p>
+            <button onclick="startWebcam()">Start Webcam</button>
+            <button id="stopButton" onclick="stopWebcam()" style="display:none;">Stop Webcam</button>
+            <button class="home-button" onclick="window.location.href='/'">Back to Home</button>
+        </div>
+        <video id="webcam" autoplay></video>
+    </div>
+
+    <script>
+        let stream;
+        const video = document.getElementById('webcam');
+        const sentimentResult = document.getElementById('sentimentResult');
+        const stopButton = document.getElementById('stopButton');
+        let isWebcamRunning = false;
+        let captureInterval;
+
+        async function startWebcam() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                video.srcObject = stream;
+                video.style.display = "block";
+                stopButton.style.display = "inline-block";
+                isWebcamRunning = true;
+                captureInterval = setInterval(captureAndAnalyzeFrame, 5000);
+            } catch (error) {
+                alert("Error accessing webcam: " + error);
+            }
+        }
+
+        function stopWebcam() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            clearInterval(captureInterval);
+            isWebcamRunning = false;
+            video.style.display = "none";
+            stopButton.style.display = "none";
+            sentimentResult.innerText = "Webcam stopped. Click 'Start Webcam' to resume.";
+        }
+
+        async function captureAndAnalyzeFrame() {
+            if (!isWebcamRunning) return;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            function getCSRFToken() {
+                let csrfToken = document.cookie.split('; ').find(row => row.startsWith('csrftoken='));
+                return csrfToken ? csrfToken.split('=')[1] : '';
+            }
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('image', imageData);
+
+                const response = await fetch('/webcam_predict/', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCSRFToken(),
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: formData.toString(),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                sentimentResult.innerText = `Sentiment: ${result.sentiment}\nDescription: ${result.description}`;
+
+                document.querySelector('.container').style.background = result.sentiment === 'Happy' ? 'rgba(34, 255, 122, 0.2)' :
+                    result.sentiment === 'Sad' ? 'rgba(34, 122, 255, 0.2)' :
+                    result.sentiment === 'Angry' ? 'rgba(255, 34, 34, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+
+            } catch (error) {
+                sentimentResult.innerText = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
