@@ -9,13 +9,14 @@ MODEL_PATH = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model.h5')  # Upd
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-a7w1b^$$z@n%iic)$8#+_u5u8c(l59(40qa!mm(5t)2p3ajget')
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 
-ALLOWED_HOSTS = ['text_sentiment_analyzer.vercel.app', '127.0.0.1']
+ALLOWED_HOSTS = ['text_sentiment_analyzer.onrender.com', '127.0.0.1']
 CSRF_TRUSTED_ORIGINS = [
-    'https://text_sentiment_analyzer.vercel.app',
-    'http://text_sentiment_analyzer.vercel.app',
+    'https://text_sentiment_analyzer.onrender.com',
     'http://localhost:3000',
-    'https://localhost:3000'
 ]
+
+# Force TensorFlow to use CPU
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 # Application definition
 INSTALLED_APPS = [
@@ -32,7 +33,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  # CORS Middleware for Vercel
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -62,9 +63,22 @@ TEMPLATES = [
 WSGI_APPLICATION = 'text_sentiment_analyzer.wsgi.application'
 
 # Database Configuration
-DATABASES = {
-    'default': dj_database_url.config(default=f'sqlite:///{BASE_DIR / "db.sqlite3"}', conn_max_age=600)
-}
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=600, ssl_require=True)
+    }
+    if "sqlite" in DATABASE_URL:
+        # Remove `sslmode` for SQLite databases
+        DATABASES["default"].pop("OPTIONS", None)
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -93,7 +107,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # CORS Configuration (Allow Frontend Domains)
 CORS_ALLOWED_ORIGINS = [
-    'https://text_sentiment_analyzer.vercel.app',
+    'https://text_sentiment_analyzer.onrender.com',
     'http://localhost:3000',
 ]
 CORS_ALLOW_CREDENTIALS = True
