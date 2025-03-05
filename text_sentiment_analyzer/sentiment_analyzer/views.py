@@ -1,3 +1,6 @@
+import warnings
+warnings.simplefilter("ignore", UserWarning)
+
 from django.shortcuts import render
 import os
 import pandas as pd

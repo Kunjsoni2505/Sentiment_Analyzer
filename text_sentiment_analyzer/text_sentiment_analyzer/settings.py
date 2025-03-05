@@ -10,6 +10,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-a7w1b^$$z@n%iic)$8#
 DEBUG = os.getenv('DEBUG', 'False').lower() in ['true', '1', 'yes']
 
 ALLOWED_HOSTS = [
+    '*',
     'text_sentiment_analyzer.onrender.com',
     'sentiment-analyzer-2h3q.onrender.com',
     '127.0.0.1',
