@@ -1,29 +1,31 @@
 import warnings
 warnings.simplefilter("ignore", UserWarning)
 
-from django.shortcuts import render
-import os
 import pandas as pd
 import requests
 import nltk
 import pickle
 from .forms import SentimentForm
 from .cleaner import TextCleaner, TextSequencer
-import google.generativeai as genai  # Import the Gemini API library
 from tensorflow.keras.models import load_model
 from django.http import HttpResponse
 import csv
-import os
 import tensorflow as tf
+from django.conf import settings
+from django.shortcuts import render, redirect
+import os
+from django.http import JsonResponse
+from PIL import Image
+import cv2
+import numpy as np
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage
+import re
+import google.generativeai as genai
+import base64
 
 # Prevent TensorFlow from using GPU (if running on CPU)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
-# Check if GPU is available before setting memory growth
-physical_devices = tf.config.list_physical_devices('GPU')
-if physical_devices:
-    tf.config.experimental.set_memory_growth(physical_devices[0], True)
-
 
 # Download necessary NLTK data
 nltk.download('stopwords')
@@ -163,24 +165,7 @@ def result(request):
 
 # image section---------------------------------------------------------------------------
 
-from django.shortcuts import render, redirect
-import os
-import google.generativeai as genai
-from django.http import JsonResponse
-from PIL import Image
-import base64
-import cv2
-import numpy as np
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage
 
-# Configure Google Gemini API
-API_KEY = "AIzaSyAz2e2mKPepUUkUWwQkoD41zCjcKqvjL0s"
-genai.configure(api_key=API_KEY)
-
-import re
-from PIL import Image
-import google.generativeai as genai
 
 
 def analyze_image(image_path):
@@ -234,12 +219,6 @@ def upload_image(request):
 
     return render(request, 'image_analysis.html')
 
-import base64
-import uuid
-from django.core.files.base import ContentFile
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-
 def webcam_predict(request):
     """Receives frames from the webcam, detects faces, and analyzes sentiment."""
     if request.method == 'POST':
@@ -290,8 +269,6 @@ def webcam_predict(request):
 def image_analysis(request):
     """Renders the image analysis page."""
     return render(request, 'image_analysis.html')
-
-from django.conf import settings
 
 def image_result(request):
     """Renders the image result page with sentiment and description."""

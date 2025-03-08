@@ -97,11 +97,6 @@
     </div>
     <div class="container">
         <h1>Image Sentiment Analysis Result</h1>
-        {% if image_path %}
-            <img src="{{ image_path }}" alt="Uploaded Image">
-        {% else %}
-            <p>No image available.</p>
-        {% endif %}
         <p><strong>Sentiment:</strong> {{ sentiment }}</p>
         <p><strong>Description:</strong> {{ description }}</p>
         <button onclick="history.back()">Go Back</button>

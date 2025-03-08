@@ -70,10 +70,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'text_sentiment_analyzer.wsgi.application'
 
-# 🚀 Removed Database Usage (Since You're Not Using One)
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.dummy"
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / "db.sqlite3",
     }
 }
 

@@ -1,6 +1,4 @@
-import pickle
-import string
-import nltk
+
 from sklearn.pipeline import Pipeline, FeatureUnion
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import train_test_split
@@ -11,10 +9,7 @@ from tensorflow.keras.layers import Embedding, SimpleRNN, Dense
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer, WordNetLemmatizer
 
-# Download NLTK resources
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
+
 
 class TextCleaner(BaseEstimator, TransformerMixin):
     def __init__(self):
