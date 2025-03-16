@@ -55,7 +55,7 @@ with open(pre_path, 'rb') as file:
 loaded_model = load_model(model_path, compile=False)
 
 # Set up Gemini Pro API
-GOOGLE_API_KEY = "AIzaSyAz2e2mKPepUUkUWwQkoD41zCjcKqvjL0s"
+GOOGLE_API_KEY = "Your-api-key"
 genai.configure(api_key=GOOGLE_API_KEY)
 
 
