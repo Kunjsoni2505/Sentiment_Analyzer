@@ -1,5 +1,14 @@
 # import warnings
 # warnings.simplefilter("ignore", UserWarning)
+import os
+
+# ===============================
+# LIMIT TENSORFLOW MEMORY USAGE
+# ===============================
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["TF_NUM_INTRAOP_THREADS"] = "1"
+os.environ["TF_NUM_INTEROP_THREADS"] = "1"
 
 import pandas as pd
 import pickle
@@ -11,7 +20,7 @@ import csv
 import tensorflow as tf
 from django.conf import settings
 from django.shortcuts import render, redirect
-import os
+
 from django.http import JsonResponse
 from PIL import Image
 import cv2
@@ -34,8 +43,6 @@ for resource in ["wordnet", "stopwords", "omw-1.4"]:
     except LookupError:
         nltk.download(resource, download_dir=NLTK_DATA_PATH)
 
-# Prevent TensorFlow from using GPU (if running on CPU)
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 
 def home(request):
@@ -56,10 +63,20 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 model_path = os.path.join(BASE_DIR, 'sentiment_analyzer', 'rnn_model_tf15.h5')
 pre_path = os.path.join(BASE_DIR, 'sentiment_analyzer', 'text_pipeline.pkl')
 
-with open(pre_path, 'rb') as file:
-    loaded_pipeline = CustomUnpickler(file).load()
+loaded_model = None
+loaded_pipeline = None
 
-loaded_model = load_model(model_path, compile=False)
+def get_model_and_pipeline():
+    global loaded_model, loaded_pipeline
+
+    if loaded_model is None or loaded_pipeline is None:
+        with open(pre_path, 'rb') as file:
+            loaded_pipeline = CustomUnpickler(file).load()
+
+        loaded_model = load_model(model_path, compile=False)
+
+    return loaded_model, loaded_pipeline
+
 
 # ===============================
 # GEMINI SETUP (ONLY CHANGE)
@@ -72,8 +89,10 @@ gemini_client = genai.Client(api_key=GOOGLE_API_KEY)
 # Prediction function
 def predict(text):
     try:
-        processed_text = loaded_pipeline.transform(pd.Series([text]))
-        prediction = loaded_model.predict(processed_text)
+        model, pipeline = get_model_and_pipeline()
+        processed_text = pipeline.transform(pd.Series([text]))
+        prediction = model.predict(processed_text)
+
         return prediction
     except Exception as e:
         return str(e)
