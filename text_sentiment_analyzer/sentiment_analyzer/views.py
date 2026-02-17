@@ -24,7 +24,15 @@ from dotenv import load_dotenv
 
 from google import genai
 import nltk
-nltk.data.path.append("/opt/render/nltk_data")
+NLTK_DATA_PATH = "/opt/render/nltk_data"
+os.makedirs(NLTK_DATA_PATH, exist_ok=True)
+nltk.data.path.append(NLTK_DATA_PATH)
+
+for resource in ["wordnet", "stopwords", "omw-1.4"]:
+    try:
+        nltk.data.find(f"corpora/{resource}")
+    except LookupError:
+        nltk.download(resource, download_dir=NLTK_DATA_PATH)
 
 # Prevent TensorFlow from using GPU (if running on CPU)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
