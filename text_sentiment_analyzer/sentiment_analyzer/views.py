@@ -2,8 +2,6 @@
 # warnings.simplefilter("ignore", UserWarning)
 
 import pandas as pd
-import requests
-import nltk
 import pickle
 from .forms import SentimentForm
 from .cleaner import TextCleaner, TextSequencer
@@ -24,16 +22,13 @@ import re
 import base64
 from dotenv import load_dotenv
 
-# ✅ NEW GEMINI SDK (ONLY CHANGE)
 from google import genai
+import nltk
+nltk.data.path.append("/opt/render/nltk_data")
 
 # Prevent TensorFlow from using GPU (if running on CPU)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
-# Download necessary NLTK data
-nltk.download('stopwords')
-nltk.download('wordnet')
-nltk.download('omw-1.4')
 
 def home(request):
     return render(request, 'home.html')
