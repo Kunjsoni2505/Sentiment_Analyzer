@@ -173,9 +173,17 @@
                 const result = await response.json();
                 sentimentResult.innerText = `Sentiment: ${result.sentiment}\nDescription: ${result.description}`;
 
-                document.querySelector('.container').style.background = result.sentiment === 'Happy' ? 'rgba(34, 255, 122, 0.2)' :
-                    result.sentiment === 'Sad' ? 'rgba(34, 122, 255, 0.2)' :
-                    result.sentiment === 'Angry' ? 'rgba(255, 34, 34, 0.2)' : 'rgba(255, 255, 255, 0.1)';
+                document.querySelector('.container').style.background =
+                        result.sentiment === 'Happy' ? 'rgba(34, 255, 122, 0.2)' :
+                        result.sentiment === 'Sad' ? 'rgba(34, 122, 255, 0.2)' :
+                        result.sentiment === 'Angry' ? 'rgba(255, 34, 34, 0.2)' :
+                        result.sentiment === 'Surprise' ? 'rgba(255, 255, 0, 0.2)' : // Bright yellow
+                        result.sentiment === 'Neutral' ? 'rgba(200, 200, 200, 0.2)' : // Soft gray
+                        result.sentiment === 'Fear' ? 'rgba(128, 0, 128, 0.2)' : // Dark purple
+                        result.sentiment === 'Disgust' ? 'rgba(0, 128, 0, 0.2)' : // Green
+                        result.sentiment === 'Contempt' ? 'rgba(255, 165, 0, 0.2)' : // Orange
+                        'rgba(255, 255, 255, 0.1)'; // Default background
+
 
             } catch (error) {
                 sentimentResult.innerText = `Error: ${error.message}`;

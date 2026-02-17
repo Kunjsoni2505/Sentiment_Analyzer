@@ -1,1 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
 .venv/
+env/
+venv/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# Uploaded files
+uploaded_images/
+webcam_images/
+captured_images/
+
+# ML / Temp
+*.log
+
+# Environment
+.env
