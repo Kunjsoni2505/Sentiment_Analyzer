@@ -166,17 +166,22 @@ def process_text(request):
         if form.is_valid():
             data = form.cleaned_data['text']
 
-            context = {
-                'form': form,
-                'prediction': predict_sentiment(data),
-                'description': get_description(data),
-            }
+            # ✅ ONLY MODEL RUNS HERE
+            sentiment = predict_sentiment(data)
 
-            return render(request, 'result.html', context)
+            # store text for later Gemini use
+            request.session["last_text"] = data
+
+            return render(request, 'result.html', {
+                'form': form,
+                'prediction': sentiment,
+                'description': None,  # Gemini disabled here
+            })
     else:
         form = SentimentForm()
 
     return render(request, 'Text.html', {'form': form})
+
 
 
 def result(request):
